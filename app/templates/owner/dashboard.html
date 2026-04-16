@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard - Smart Parking{% endblock %}
+{% block head %}
+<style>
+  .stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+    transition: transform 0.3s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .area-card {
+    border: 1px solid #e9ecef;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+  }
+  .area-card:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  .area-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 20px;
+  }
+  .booking-item {
+    border-left: 4px solid #667eea;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+    border-radius: 0 10px 10px 0;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Welcome back, {{ current_user.name }}!</h2>
+  <a href="/owner/areas" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Manage Areas
+  </a>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-number">{{ areas|length }}</div>
+      <div>Parking Areas</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_slots }}</div>
+      <div>Total Slots</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_bookings }}</div>
+      <div>Total Bookings</div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- My Areas -->
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">My Parking Areas</h5>
+      </div>
+      <div class="card-body">
+        {% if areas %}
+          {% for area in areas %}
+          <div class="area-card">
+            <div class="area-header">
+              <h6 class="mb-1">{{ area.name }}</h6>
+              <small>{{ area.address }}</small>
+            </div>
+            <div class="p-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <strong>Rate:</strong> ${{ "%.2f"|format(area.hourly_rate) }}/hour<br>
+                  <strong>Slots:</strong> {{ area.slots|length }}<br>
+                  <strong>Status:</strong> 
+                  <span class="badge bg-{{ 'success' if area.is_active else 'danger' }}">
+                    {{ 'Active' if area.is_active else 'Inactive' }}
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <strong>Hours:</strong> {{ area.operating_hours }}<br>
+                  <strong>Created:</strong> {{ area.created_at.strftime('%Y-%m-%d') }}
+                </div>
+              </div>
+              <div class="mt-3">
+                <a href="/owner/areas/{{ area.id }}/slots" class="btn btn-sm btn-outline-primary">Manage Slots</a>
+                <a href="/owner/areas/{{ area.id }}/bookings" class="btn btn-sm btn-outline-info">View Bookings</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-parking fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No parking areas yet</h5>
+            <p class="text-muted">Create your first parking area to start earning!</p>
+            <a href="/owner/areas" class="btn btn-primary">Add Parking Area</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Bookings -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Recent Bookings</h5>
+      </div>
+      <div class="card-body">
+        {% if recent_bookings %}
+          {% for booking in recent_bookings %}
+          <div class="booking-item">
+            <div class="d-flex justify-content-between">
+              <strong>{{ booking.slot.code }}</strong>
+              <span class="badge bg-{{ 'success' if booking.status == 'confirmed' else 'warning' }}">
+                {{ booking.status.title() }}
+              </span>
+            </div>
+            <small class="text-muted">
+              {{ booking.user.email }}<br>
+              {{ booking.start_time.strftime('%m/%d %H:%M') }} - {{ booking.end_time.strftime('%H:%M') }}
+            </small>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-3">
+            <i class="fas fa-calendar fa-2x text-muted mb-2"></i>
+            <p class="text-muted mb-0">No recent bookings</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

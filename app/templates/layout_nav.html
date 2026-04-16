@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); backdrop-filter: blur(10px);">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="/">🚗 Smart Parking</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        {% if current_user.is_authenticated %}
+          {% if current_user.role == 'admin' %}
+            <li class="nav-item"><a class="nav-link" href="/admin">Admin Dashboard</a></li>
+          {% elif current_user.role == 'slot_owner' %}
+            <li class="nav-item"><a class="nav-link" href="/owner">My Areas</a></li>
+          {% endif %}
+        {% endif %}
+      </ul>
+      <ul class="navbar-nav">
+        {% if current_user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              {{ current_user.name }} ({{ current_user.role.title() }})
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/profile">Profile</a></li>
+              {% if current_user.role == 'user' %}
+                <li><a class="dropdown-item" href="/my-bookings">My Bookings</a></li>
+              {% endif %}
+              {% if not current_user.is_verified %}
+                <li><a class="dropdown-item" href="/auth/verification-status">
+                  <i class="fas fa-clock text-warning"></i> Verification Status
+                </a></li>
+              {% endif %}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link btn btn-outline-light ms-2" href="/auth/signup">Sign up</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+

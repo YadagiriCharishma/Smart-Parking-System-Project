@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% block title %}Sign up - Smart Parking{% endblock %}
+{% block head %}
+<style>
+  .role-card {
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+  }
+  .role-card:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+  }
+  .role-card.selected {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+  .role-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+  }
+  .form-section {
+    display: none;
+  }
+  .form-section.active {
+    display: block;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Join Smart Parking</h2>
+      <p class="text-muted">Choose your role to get started</p>
+    </div>
+    
+    <form method="post" action="/auth/signup" id="signupForm">
+      <input type="hidden" name="role" id="selectedRole" value="">
+      
+      <!-- Role Selection -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="role-card" data-role="user">
+            <div class="role-icon">🚗</div>
+            <h5>Parking User</h5>
+            <p class="mb-0">Find and book parking spots</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="role-card" data-role="slot_owner">
+            <div class="role-icon">🏢</div>
+            <h5>Slot Owner</h5>
+            <p class="mb-0">Manage parking areas and earn money</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- User Registration Form -->
+      <div class="form-section" id="userForm">
+        <h4 class="mb-3">User Registration</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="user_name" class="form-control" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" name="user_email" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Phone</label>
+              <input type="tel" name="user_phone" class="form-control">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" name="user_password" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Address</label>
+          <textarea name="user_address" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+      
+      <!-- Slot Owner Registration Form -->
+      <div class="form-section" id="slotOwnerForm">
+        <h4 class="mb-3">Slot Owner Registration</h4>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="owner_name" class="form-control" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" name="owner_email" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Company Name</label>
+              <input type="text" name="company_name" class="form-control" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Business License Number</label>
+              <input type="text" name="license_number" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Phone</label>
+              <input type="tel" name="owner_phone" class="form-control" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" name="owner_password" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Business Address</label>
+          <textarea name="owner_address" class="form-control" rows="2" required></textarea>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <button class="btn btn-primary btn-lg px-5" type="submit" id="submitBtn" disabled>
+          Create Account
+        </button>
+        <p class="mt-3">
+          Already have an account? <a href="/auth/login">Sign in</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const roleCards = document.querySelectorAll('.role-card');
+  const userForm = document.getElementById('userForm');
+  const slotOwnerForm = document.getElementById('slotOwnerForm');
+  const selectedRoleInput = document.getElementById('selectedRole');
+  const submitBtn = document.getElementById('submitBtn');
+  const signupForm = document.getElementById('signupForm');
+  
+  roleCards.forEach(card => {
+    card.addEventListener('click', function() {
+      // Remove selected class from all cards
+      roleCards.forEach(c => c.classList.remove('selected'));
+      // Add selected class to clicked card
+      this.classList.add('selected');
+      
+      const role = this.dataset.role;
+      selectedRoleInput.value = role;
+      
+      // Show appropriate form
+      if (role === 'user') {
+        userForm.classList.add('active');
+        slotOwnerForm.classList.remove('active');
+        // Remove required attributes from slot owner form
+        slotOwnerForm.querySelectorAll('[required]').forEach(field => {
+          field.removeAttribute('required');
+        });
+        // Add required attributes to user form
+        userForm.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]').forEach(field => {
+          if (field.name !== 'user_phone' && field.name !== 'user_address') {
+            field.setAttribute('required', 'required');
+          }
+        });
+      } else if (role === 'slot_owner') {
+        slotOwnerForm.classList.add('active');
+        userForm.classList.remove('active');
+        // Remove required attributes from user form
+        userForm.querySelectorAll('[required]').forEach(field => {
+          field.removeAttribute('required');
+        });
+        // Add required attributes to slot owner form
+        slotOwnerForm.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea').forEach(field => {
+          field.setAttribute('required', 'required');
+        });
+      }
+      
+      submitBtn.disabled = false;
+    });
+  });
+  
+  // Handle form submission
+  signupForm.addEventListener('submit', function(e) {
+    const role = selectedRoleInput.value;
+    
+    if (role === 'user') {
+      // Map user form fields to standard names
+      const nameField = userForm.querySelector('input[name="user_name"]');
+      const emailField = userForm.querySelector('input[name="user_email"]');
+      const passwordField = userForm.querySelector('input[name="user_password"]');
+      const phoneField = userForm.querySelector('input[name="user_phone"]');
+      const addressField = userForm.querySelector('textarea[name="user_address"]');
+      
+      // Create hidden inputs with standard names
+      const hiddenName = document.createElement('input');
+      hiddenName.type = 'hidden';
+      hiddenName.name = 'name';
+      hiddenName.value = nameField.value;
+      
+      const hiddenEmail = document.createElement('input');
+      hiddenEmail.type = 'hidden';
+      hiddenEmail.name = 'email';
+      hiddenEmail.value = emailField.value;
+      
+      const hiddenPassword = document.createElement('input');
+      hiddenPassword.type = 'hidden';
+      hiddenPassword.name = 'password';
+      hiddenPassword.value = passwordField.value;
+      
+      const hiddenPhone = document.createElement('input');
+      hiddenPhone.type = 'hidden';
+      hiddenPhone.name = 'phone';
+      hiddenPhone.value = phoneField.value;
+      
+      const hiddenAddress = document.createElement('input');
+      hiddenAddress.type = 'hidden';
+      hiddenAddress.name = 'address';
+      hiddenAddress.value = addressField.value;
+      
+      signupForm.appendChild(hiddenName);
+      signupForm.appendChild(hiddenEmail);
+      signupForm.appendChild(hiddenPassword);
+      signupForm.appendChild(hiddenPhone);
+      signupForm.appendChild(hiddenAddress);
+      
+    } else if (role === 'slot_owner') {
+      // Map slot owner form fields to standard names
+      const nameField = slotOwnerForm.querySelector('input[name="owner_name"]');
+      const emailField = slotOwnerForm.querySelector('input[name="owner_email"]');
+      const passwordField = slotOwnerForm.querySelector('input[name="owner_password"]');
+      const phoneField = slotOwnerForm.querySelector('input[name="owner_phone"]');
+      const addressField = slotOwnerForm.querySelector('textarea[name="owner_address"]');
+      const companyField = slotOwnerForm.querySelector('input[name="company_name"]');
+      const licenseField = slotOwnerForm.querySelector('input[name="license_number"]');
+      
+      // Create hidden inputs with standard names
+      const hiddenName = document.createElement('input');
+      hiddenName.type = 'hidden';
+      hiddenName.name = 'name';
+      hiddenName.value = nameField.value;
+      
+      const hiddenEmail = document.createElement('input');
+      hiddenEmail.type = 'hidden';
+      hiddenEmail.name = 'email';
+      hiddenEmail.value = emailField.value;
+      
+      const hiddenPassword = document.createElement('input');
+      hiddenPassword.type = 'hidden';
+      hiddenPassword.name = 'password';
+      hiddenPassword.value = passwordField.value;
+      
+      const hiddenPhone = document.createElement('input');
+      hiddenPhone.type = 'hidden';
+      hiddenPhone.name = 'phone';
+      hiddenPhone.value = phoneField.value;
+      
+      const hiddenAddress = document.createElement('input');
+      hiddenAddress.type = 'hidden';
+      hiddenAddress.name = 'address';
+      hiddenAddress.value = addressField.value;
+      
+      const hiddenCompany = document.createElement('input');
+      hiddenCompany.type = 'hidden';
+      hiddenCompany.name = 'company_name';
+      hiddenCompany.value = companyField.value;
+      
+      const hiddenLicense = document.createElement('input');
+      hiddenLicense.type = 'hidden';
+      hiddenLicense.name = 'license_number';
+      hiddenLicense.value = licenseField.value;
+      
+      signupForm.appendChild(hiddenName);
+      signupForm.appendChild(hiddenEmail);
+      signupForm.appendChild(hiddenPassword);
+      signupForm.appendChild(hiddenPhone);
+      signupForm.appendChild(hiddenAddress);
+      signupForm.appendChild(hiddenCompany);
+      signupForm.appendChild(hiddenLicense);
+    }
+  });
+});
+</script>
+{% endblock %}
+
+

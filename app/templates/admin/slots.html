@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Manage Slots - Smart Parking{% endblock %}
+{% block content %}
+<h3>Manage Slots</h3>
+
+<form method="post" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <label class="form-label">Area</label>
+    <select class="form-select" name="area_id" required>
+      {% for a in areas %}
+        <option value="{{ a.id }}">{{ a.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Code</label>
+    <input class="form-control" name="code" placeholder="A-01" required>
+  </div>
+  <div class="col-md-2 d-flex align-items-end">
+    <button class="btn btn-primary w-100" type="submit">Add</button>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Area</th><th>Code</th></tr></thead>
+  <tbody>
+    {% for s in slots %}
+      <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.area.name }}</td>
+        <td>{{ s.code }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="3">No slots</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+

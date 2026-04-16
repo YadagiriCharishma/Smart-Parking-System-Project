@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}{{ area.name }} - Smart Parking{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <h3>{{ area.name }}</h3>
+    <p class="text-muted">{{ area.address }}</p>
+    {% if area.description %}
+      <p>{{ area.description }}</p>
+    {% endif %}
+    
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <strong>Hourly Rate:</strong> ${{ "%.2f"|format(area.hourly_rate) }}
+      </div>
+      <div class="col-md-4">
+        <strong>Operating Hours:</strong> {{ area.operating_hours }}
+      </div>
+      <div class="col-md-4">
+        <strong>Total Slots:</strong> {{ area.slots|length }}
+      </div>
+    </div>
+    
+    <div id="availability" data-area-id="{{ area_id }}">
+      <!-- Slots grid will load here -->
+      <div class="text-muted">Loading availability...</div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">Area Information</h6>
+      </div>
+      <div class="card-body">
+        <p><strong>Owner:</strong> {{ area.owner.name if area.owner else 'System' }}</p>
+        <p><strong>Status:</strong> 
+          <span class="badge bg-{{ 'success' if area.is_active else 'danger' }}">
+            {{ 'Active' if area.is_active else 'Inactive' }}
+          </span>
+        </p>
+        {% if area.amenities %}
+        <p><strong>Amenities:</strong><br>
+          <small class="text-muted">{{ area.amenities }}</small>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  async function loadAvailability(){
+    try {
+      const areaId = document.getElementById('availability').dataset.areaId;
+      console.log('Loading availability for area:', areaId);
+      const res = await fetch(`/api/areas/${areaId}/availability`);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      const html = await res.text();
+      console.log('Received HTML:', html);
+      
+      document.getElementById('availability').innerHTML = html + `
+        <form method='post' action='/area/${areaId}/book' class='mt-3'>
+          <div class='row g-2 align-items-end'>
+            <div class='col-md-4'>
+              <label class='form-label'>Slot ID</label>
+              <input type='number' name='slot_id' class='form-control' required>
+            </div>
+            <div class='col-md-4'>
+              <label class='form-label'>Hours</label>
+              <input type='number' name='hours' value='1' min='1' class='form-control' required>
+            </div>
+            <div class='col-md-4'>
+              <button class='btn btn-primary' type='submit'>Book</button>
+            </div>
+          </div>
+        </form>`;
+    } catch (error) {
+      console.error('Error loading availability:', error);
+      document.getElementById('availability').innerHTML = `
+        <div class="alert alert-danger">
+          <h5>Error Loading Availability</h5>
+          <p>Could not load parking slot availability. Please try refreshing the page.</p>
+          <p><small>Error: ${error.message}</small></p>
+        </div>`;
+    }
+  }
+  
+  // Load immediately and then every 10 seconds
+  loadAvailability();
+  setInterval(loadAvailability, 10000);
+</script>
+{% endblock %}
+
+

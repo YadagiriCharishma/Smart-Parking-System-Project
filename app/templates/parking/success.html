@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Booking Confirmed - Smart Parking{% endblock %}
+{% block content %}
+<h3>Booking Confirmed</h3>
+<p>Booking ID: <strong>{{ booking.id }}</strong></p>
+<p>Slot: <strong>{{ booking.slot.code }}</strong></p>
+<p>From: <strong>{{ booking.start_time }}</strong> to <strong>{{ booking.end_time }}</strong></p>
+{% if booking.qr_path %}
+  <img src="{{ url_for('static', filename=booking.qr_path.replace('app/static/','')) }}" alt="QR Code" style="max-width:200px;"/>
+{% endif %}
+<a class="btn btn-primary" href="/">Back to Home</a>
+{% endblock %}
+
+

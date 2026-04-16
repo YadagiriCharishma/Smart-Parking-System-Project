@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% block title %}User Management - Smart Parking{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>User Management</h2>
+  <div>
+    <span class="badge bg-warning">{{ users|selectattr('is_verified', 'equalto', false)|list|length }} Pending</span>
+    <span class="badge bg-success">{{ users|selectattr('is_verified', 'equalto', true)|list|length }} Verified</span>
+  </div>
+</div>
+
+<!-- Filter Tabs -->
+<ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
+      All Users ({{ users|length }})
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
+      Pending Verification ({{ users|selectattr('is_verified', 'equalto', false)|list|length }})
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="slot-owners-tab" data-bs-toggle="tab" data-bs-target="#slot-owners" type="button">
+      Slot Owners ({{ users|selectattr('role', 'equalto', 'slot_owner')|list|length }})
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="userTabsContent">
+  <!-- All Users -->
+  <div class="tab-pane fade show active" id="all">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Company</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>
+              <strong>{{ user.name }}</strong>
+              {% if user.phone %}
+                <br><small class="text-muted">{{ user.phone }}</small>
+              {% endif %}
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge bg-{{ 'primary' if user.role == 'user' else 'info' if user.role == 'slot_owner' else 'danger' }}">
+                {{ user.role.title() }}
+              </span>
+            </td>
+            <td>
+              {% if user.is_verified %}
+                <span class="badge bg-success">Verified</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if user.company_name %}
+                {{ user.company_name }}
+                {% if user.license_number %}
+                  <br><small class="text-muted">License: {{ user.license_number }}</small>
+                {% endif %}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+              {% if not user.is_verified and user.role == 'slot_owner' %}
+                <div class="btn-group btn-group-sm">
+                  <form method="post" action="/admin/users/{{ user.id }}/verify" class="d-inline">
+                    <button type="submit" class="btn btn-success btn-sm" 
+                            onclick="return confirm('Verify this slot owner?')">
+                      <i class="fas fa-check"></i> Verify
+                    </button>
+                  </form>
+                  <form method="post" action="/admin/users/{{ user.id }}/reject" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm" 
+                            onclick="return confirm('Send rejection email?')">
+                      <i class="fas fa-times"></i> Reject
+                    </button>
+                  </form>
+                </div>
+              {% elif user.is_verified %}
+                <span class="text-success">
+                  <i class="fas fa-check-circle"></i> Verified
+                </span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Pending Verification -->
+  <div class="tab-pane fade" id="pending">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Company</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            {% if not user.is_verified %}
+            <tr>
+              <td><strong>{{ user.name }}</strong></td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="badge bg-{{ 'primary' if user.role == 'user' else 'info' if user.role == 'slot_owner' else 'danger' }}">
+                  {{ user.role.title() }}
+                </span>
+              </td>
+              <td>
+                {% if user.company_name %}
+                  {{ user.company_name }}
+                  {% if user.license_number %}
+                    <br><small class="text-muted">License: {{ user.license_number }}</small>
+                  {% endif %}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>
+                {% if user.role == 'slot_owner' %}
+                  <div class="btn-group btn-group-sm">
+                    <form method="post" action="/admin/users/{{ user.id }}/verify" class="d-inline">
+                      <button type="submit" class="btn btn-success btn-sm" 
+                              onclick="return confirm('Verify this slot owner?')">
+                        <i class="fas fa-check"></i> Verify
+                      </button>
+                    </form>
+                    <form method="post" action="/admin/users/{{ user.id }}/reject" class="d-inline">
+                      <button type="submit" class="btn btn-danger btn-sm" 
+                              onclick="return confirm('Send rejection email?')">
+                        <i class="fas fa-times"></i> Reject
+                      </button>
+                    </form>
+                  </div>
+                {% else %}
+                  <span class="text-muted">Auto-verified</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Slot Owners -->
+  <div class="tab-pane fade" id="slot-owners">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Areas</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            {% if user.role == 'slot_owner' %}
+            <tr>
+              <td><strong>{{ user.name }}</strong></td>
+              <td>{{ user.email }}</td>
+              <td>
+                {{ user.company_name or '-' }}
+                {% if user.license_number %}
+                  <br><small class="text-muted">License: {{ user.license_number }}</small>
+                {% endif %}
+              </td>
+              <td>
+                {% if user.is_verified %}
+                  <span class="badge bg-success">Verified</span>
+                {% else %}
+                  <span class="badge bg-warning">Pending</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-info">{{ user.owned_areas|length }} areas</span>
+              </td>
+              <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>
+                {% if not user.is_verified %}
+                  <div class="btn-group btn-group-sm">
+                    <form method="post" action="/admin/users/{{ user.id }}/verify" class="d-inline">
+                      <button type="submit" class="btn btn-success btn-sm" 
+                              onclick="return confirm('Verify this slot owner?')">
+                        <i class="fas fa-check"></i> Verify
+                      </button>
+                    </form>
+                    <form method="post" action="/admin/users/{{ user.id }}/reject" class="d-inline">
+                      <button type="submit" class="btn btn-danger btn-sm" 
+                              onclick="return confirm('Send rejection email?')">
+                        <i class="fas fa-times"></i> Reject
+                      </button>
+                    </form>
+                  </div>
+                {% else %}
+                  <span class="text-success">
+                    <i class="fas fa-check-circle"></i> Verified
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Payment - Smart Parking{% endblock %}
+{% block content %}
+<h3>Payment</h3>
+<p>Area: <strong>{{ area.name }}</strong> | Slot: <strong>{{ slot.code }}</strong></p>
+<p>Hours: <strong>{{ hours }}</strong> | Total: <strong>${{ '%.2f'|format(total) }}</strong></p>
+
+<form method="post" action="{{ url_for('parking.confirm_booking', area_id=area.id) }}">
+  <input type="hidden" name="slot_id" value="{{ slot.id }}"/>
+  <input type="hidden" name="hours" value="{{ hours }}"/>
+  <div class="mb-3">
+    <label class="form-label">Card Number</label>
+    <input class="form-control" placeholder="4111 1111 1111 1111" required>
+  </div>
+  <div class="row g-2">
+    <div class="col">
+      <label class="form-label">Expiry</label>
+      <input class="form-control" placeholder="12/30" required>
+    </div>
+    <div class="col">
+      <label class="form-label">CVV</label>
+      <input class="form-control" placeholder="123" required>
+    </div>
+  </div>
+  <button class="btn btn-success mt-3" type="submit">Pay & Confirm</button>
+  <a class="btn btn-secondary mt-3" href="{{ url_for('parking.area_detail', area_id=area.id) }}">Cancel</a>
+</form>
+{% endblock %}
+
+

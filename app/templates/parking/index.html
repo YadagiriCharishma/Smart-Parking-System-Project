@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% block title %}Smart Parking - Find Your Perfect Spot{% endblock %}
+{% block head %}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5a67d8;
+      --secondary: #764ba2;
+      --accent: #f093fb;
+      --success: #48bb78;
+      --warning: #ed8936;
+      --danger: #f56565;
+      --dark: #2d3748;
+      --light: #f7fafc;
+      --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      --gradient-light: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --shadow: 0 10px 25px rgba(0,0,0,0.1);
+      --shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    body { font-family: 'Inter', sans-serif; background: var(--light); }
+    
+    .hero {
+      background: var(--gradient);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      color: white;
+      text-align: center;
+    }
+    
+    .hero h1 {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease-out;
+    }
+    
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      animation: fadeInUp 1s ease-out 0.2s both;
+    }
+    
+    .cta-buttons {
+      animation: fadeInUp 1s ease-out 0.4s both;
+    }
+    
+    .btn-hero {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 15px 30px;
+      font-weight: 600;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      margin: 0 10px;
+    }
+    
+    .btn-hero:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .features {
+      padding: 100px 0;
+      background: white;
+    }
+    
+    .feature-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-light);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover::before {
+      left: 0;
+      opacity: 0.05;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+      color: white;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+    
+    .feature-card h4 {
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--dark);
+    }
+    
+    .feature-card p {
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .areas-section {
+      padding: 100px 0;
+      background: var(--light);
+    }
+    
+    .area-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+    }
+    
+    .area-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    .area-header {
+      background: var(--gradient);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .area-body {
+      padding: 25px;
+    }
+    
+    .area-stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .fade-in {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+{% endblock %}
+{% block landing_content %}
+<div class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1>Smart Parking</h1>
+      <p>Find, book, and manage parking spots with ease. Real-time availability, instant booking, and seamless payments.</p>
+      <div class="cta-buttons">
+        <a href="#areas" class="btn btn-hero">Find Parking</a>
+        <a href="/auth/signup" class="btn btn-hero">Get Started</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="features">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="display-4 fw-bold mb-3">Why Choose Smart Parking?</h2>
+        <p class="lead text-muted">Revolutionary parking management for the modern city</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">🚗</div>
+          <h4>Real-Time Availability</h4>
+          <p>See which parking spots are available in real-time with our live updates every 10 seconds.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h4>Instant Booking</h4>
+          <p>Book your parking spot in seconds with our streamlined booking process and secure payments.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">🔔</div>
+          <h4>Smart Notifications</h4>
+          <p>Get instant confirmations, QR codes, and email receipts for all your parking bookings.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">⏰</div>
+          <h4>Auto-Release</h4>
+          <p>Slots automatically release when your time expires, ensuring fair access for everyone.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h4>Analytics Dashboard</h4>
+          <p>Comprehensive insights and usage statistics for administrators and city planners.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <h4>City-Wide Coverage</h4>
+          <p>Scalable solution designed for city-wide deployment with multiple parking areas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="areas-section" id="areas">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="display-4 fw-bold mb-3">Available Parking Areas</h2>
+        <p class="lead text-muted">Choose from our network of smart parking locations</p>
+      </div>
+    </div>
+    <div class="row">
+      {% for a in areas %}
+      <div class="col-md-6 col-lg-4">
+        <div class="area-card">
+          <div class="area-header">
+            <h4 class="mb-0">{{ a.name }}</h4>
+            <p class="mb-0 opacity-75">{{ a.address or 'Downtown Location' }}</p>
+          </div>
+          <div class="area-body">
+            <div class="area-stats">
+              <div class="stat">
+                <div class="stat-number">{{ a.slots|length }}</div>
+                <div class="stat-label">Total Slots</div>
+              </div>
+              <div class="stat">
+                <div class="stat-number pulse">{{ a.slots|selectattr('id', 'in', a.slots|map(attribute='id')|list)|list|length }}</div>
+                <div class="stat-label">Available</div>
+              </div>
+              <div class="stat">
+                <div class="stat-number">${{ "%.2f"|format(a.hourly_rate) }}</div>
+                <div class="stat-label">Per Hour</div>
+              </div>
+            </div>
+            {% if a.description %}
+            <p class="text-muted small mb-3">{{ a.description[:80] }}{% if a.description|length > 80 %}...{% endif %}</p>
+            {% endif %}
+            {% if a.amenities %}
+            <div class="mb-3">
+              <small class="text-muted">
+                <i class="fas fa-star"></i> {{ a.amenities[:50] }}{% if a.amenities|length > 50 %}...{% endif %}
+              </small>
+            </div>
+            {% endif %}
+            <a href="/area/{{ a.id }}" class="btn btn-primary w-100">View & Book</a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-center">
+        <div class="feature-card">
+          <div class="feature-icon">🏗️</div>
+          <h4>Coming Soon</h4>
+          <p>We're setting up parking areas in your city. Check back soon for available locations!</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Bookings - Smart Parking{% endblock %}
+{% block content %}
+<h3>Bookings History</h3>
+
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>User</th><th>Area</th><th>Slot</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for b in bookings %}
+      <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.user.email }}</td>
+        <td>{{ b.slot.area.name }}</td>
+        <td>{{ b.slot.code }}</td>
+        <td>{{ b.start_time }}</td>
+        <td>{{ b.end_time }}</td>
+        <td>{{ b.status }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7">No bookings yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+

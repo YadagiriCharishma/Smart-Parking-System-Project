@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Manage Areas - Smart Parking{% endblock %}
+{% block content %}
+<h3>Manage Parking Areas</h3>
+
+<form method="post" class="row g-2 mb-3">
+  <div class="col-md-3"><input class="form-control" name="name" placeholder="Name" required></div>
+  <div class="col-md-3"><input class="form-control" name="address" placeholder="Address"></div>
+  <div class="col-md-2"><input class="form-control" name="latitude" placeholder="Lat" type="number" step="any"></div>
+  <div class="col-md-2"><input class="form-control" name="longitude" placeholder="Lng" type="number" step="any"></div>
+  <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Add</button></div>
+</form>
+
+<table class="table table-striped">
+  <thead><tr><th>ID</th><th>Name</th><th>Address</th><th>Coordinates</th></tr></thead>
+  <tbody>
+    {% for a in areas %}
+      <tr>
+        <td>{{ a.id }}</td>
+        <td>{{ a.name }}</td>
+        <td>{{ a.address }}</td>
+        <td>{{ a.latitude }}, {{ a.longitude }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4">No areas</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+

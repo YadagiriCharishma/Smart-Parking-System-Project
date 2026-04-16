@@ -1,0 +1,6 @@
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.slot{padding:12px;border-radius:6px;text-align:center;color:#fff;font-weight:600}
+.slot.available{background:#28a745}
+.slot.booked{background:#dc3545}
+
+
